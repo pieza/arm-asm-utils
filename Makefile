@@ -2,27 +2,29 @@ CC=arm-linux-gnueabihf-gcc
 QEMU=qemu-arm
 GDB=gdb-multiarch
 CFLAGS=-nostdlib -static
-TARGET=myfile
+TARGET=myfirst
 SRC=$(TARGET).s
 PORT=4242
-GDB_CMDS=gdb_commands
+BUILD_DIR=build
+GDB_CMDS=$(BUILD_DIR)/gdb_commands
 
 all: build run
 
 build:
-        $(CC) -o $(TARGET) $(SRC) $(CFLAGS)
+	@mkdir -p $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/$(TARGET) $(SRC) $(CFLAGS)
 
 run: build
-        $(QEMU) -g $(PORT) ./$(TARGET)
+	$(QEMU) -g $(PORT) ./$(BUILD_DIR)/$(TARGET)
 
-debug:
-        @echo "file ./$(TARGET)" > $(GDB_CMDS)
-        @echo "target remote localhost:$(PORT)" >> $(GDB_CMDS)
-        @echo "lay next" >> $(GDB_CMDS)
-        @echo "lay next" >> $(GDB_CMDS)
-        @echo "lay next" >> $(GDB_CMDS)
-        @echo "lay next" >> $(GDB_CMDS)
-        $(GDB) -x $(GDB_CMDS)
+debug: 
+	@echo "file ./$(BUILD_DIR)/$(TARGET)" > $(GDB_CMDS)
+	@echo "target remote localhost:$(PORT)" >> $(GDB_CMDS)
+	@echo "lay next" >> $(GDB_CMDS)
+	@echo "lay next" >> $(GDB_CMDS)
+	@echo "lay next" >> $(GDB_CMDS)
+	@echo "lay next" >> $(GDB_CMDS)
+	$(GDB) -x $(GDB_CMDS)
 
 clean:
-        rm -f $(TARGET)
+	rm -rf $(BUILD_DIR)
